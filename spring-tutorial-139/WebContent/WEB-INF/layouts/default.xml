@@ -74,6 +74,10 @@
 		<put-attribute name="title" value="Offer Deleted"></put-attribute>
 		<put-attribute name="content" value="/WEB-INF/tiles/offerdeleted.jsp"></put-attribute>
 	</definition>
+	<definition name="showContactForm" extends="offers.base">
+		<put-attribute name="title" value="send message"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/tiles/contact.jsp"></put-attribute>
+	</definition>
 </tiles-definitions>
 
 

@@ -1,7 +1,7 @@
 package com.caveofprogramming.spring.web.test.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
@@ -37,7 +37,10 @@ public class OfferDaoTests {
 
 	@Autowired
 	private DataSource dataSource;
-
+	
+	private User user1 = new User("test1test1", "testname", "passpass", "email@email.com", true, "ROLE_ADMIN");
+	private Offer offer1 = new Offer(user1, "this is text1");
+	
 	@Before
 	public void init() {
 		JdbcTemplate jdbc = new JdbcTemplate(dataSource);
@@ -47,20 +50,26 @@ public class OfferDaoTests {
 	}
 
 	@Test
+	public void getUsername() {
+		usersDao.create(user1);
+		 offersDao.saveOrUpdate(offer1);
+		List<Offer> offer = offersDao.getOffers(user1.getUsername());
+		assertEquals("expected size 1",1, offer.size());
+	}
+	@Test
 	public void testOffers() {
-
+	
 		User user = new User("johnwpurcell", "John Purcell", "hellothere",
 				"john@caveofprogramming.com", true, "user");
 
 		usersDao.create(user);
 
 		Offer offer = new Offer(user, "This is a test offer.");
-
-		assertTrue("Offer creation should return true", offersDao.create(offer));
+		offersDao.saveOrUpdate(offer);
 
 		List<Offer> offers = offersDao.getOffers();
 
-		assertEquals("Should be one offer in database.", 1, offers.size());
+		assertEquals("Should be ** offer in database.", 1, offers.size());
 
 		assertEquals("Retrieved offer should match created offer.", offer,
 				offers.get(0));
@@ -69,7 +78,7 @@ public class OfferDaoTests {
 		offer = offers.get(0);
 
 		offer.setText("Updated offer text.");
-		assertTrue("Offer update should return true", offersDao.update(offer));
+		 offersDao.saveOrUpdate(offer);
 
 		Offer updated = offersDao.getOffer(offer.getId());
 
@@ -79,10 +88,11 @@ public class OfferDaoTests {
 		// Test get by ID ///////
 		Offer offer2 = new Offer(user, "This is a test offer.");
 
-		assertTrue("Offer creation should return true", offersDao.create(offer2));
+	  offersDao.saveOrUpdate(offer2);
 		
 		List<Offer> userOffers = offersDao.getOffers(user.getUsername());
-		assertEquals("Should be two offers for user.", 2, userOffers.size());
+		System.out.println(userOffers);
+		assertEquals("Should be "+userOffers.size()+" offers for user.", 2, userOffers.size());
 		
 		List<Offer> secondList = offersDao.getOffers();
 		
@@ -99,5 +109,22 @@ public class OfferDaoTests {
 
 		assertEquals("Offers lists should contain one offer.", 1, finalList.size());
 	}
-
+	@Test
+	public void testDelete() {
+		User user = new User("deleteTest", "John Purcell", "hellothere",
+				"john@caveofprogramming.com", true, "user");
+		User user1 = new User("deleteTest1", "John Purcell", "hellothere",
+				"john@caveofprogramming.com", true, "user");
+		usersDao.create(user);
+		usersDao.create(user1);
+		
+		Offer offer = new Offer(user, "This is a test offer.");
+		Offer offer1 = new Offer(user, "This is a test1 offer.");
+		offersDao.saveOrUpdate(offer);
+		offersDao.saveOrUpdate(offer1);
+		offersDao.delete(offer1.getId());
+		
+		offer1 = offersDao.getOffer(offer1.getId());
+		assertNull("this should be null",offer1);
+	}
 }

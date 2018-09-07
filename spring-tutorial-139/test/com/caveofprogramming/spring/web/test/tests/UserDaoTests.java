@@ -1,8 +1,8 @@
 package com.caveofprogramming.spring.web.test.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -49,7 +49,12 @@ public class UserDaoTests {
 		jdbc.execute("delete from offers");
 		jdbc.execute("delete from users");
 	}
-	
+	@Test 
+	public void testExists() {
+		usersDao.create(user1);
+		assertFalse("User should not exist.", usersDao.exists(/*user.getUsername()*/"rgdrgdf"));
+		assertTrue("User should  exist.", usersDao.exists(user1.getUsername()));
+	}
 	@Test
 	public void testCreateRetrieve() {
 		usersDao.create(user1);
@@ -67,25 +72,6 @@ public class UserDaoTests {
 		List<User> users2 = usersDao.getAllUsers();
 		
 		assertEquals("Should be four retrieved users.", 4, users2.size());
-	}
-
-	// TODO - Reimplement this
-	@Test
-	public void testUsers() {
-		User user = new User("johnwpurcell", "John Purcell", "hellothere",
-				"john@caveofprogramming.com", true, "user");
-
-		usersDao.create(user);
-
-		List<User> users = usersDao.getAllUsers();
-
-		assertEquals("Number of users should be 1.", 1, users.size());
-
-		assertTrue("User should exist.", usersDao.exists(user.getUsername()));
-
-		assertEquals("Created user should be identical to retrieved user",
-				user, users.get(0));
-
 	}
 
 }
